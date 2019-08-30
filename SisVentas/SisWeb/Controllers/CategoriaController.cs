@@ -28,6 +28,9 @@ namespace SisWeb.Controllers
             return await _context.categorias.ToListAsync();
         }
 
+
+
+
         // GET: api/Categoria/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Categoria>> GetCategoria(int id)
