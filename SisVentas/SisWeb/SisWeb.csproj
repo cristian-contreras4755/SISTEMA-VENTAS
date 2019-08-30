@@ -16,4 +16,9 @@
     <ProjectReference Include="..\Entidad\Entidad.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Models\Usuarios\" />
+    <Folder Include="Models\Ventas\" />
+  </ItemGroup>
+
 </Project>
