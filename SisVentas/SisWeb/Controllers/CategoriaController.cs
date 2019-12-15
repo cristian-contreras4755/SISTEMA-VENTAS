@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Datos;
 using Entidad.Almacen;
 using SisWeb.Models.Almacen.Categoria;
+using Microsoft.AspNetCore.Cors;
 
 namespace SisWeb.Controllers
 {
@@ -100,8 +101,9 @@ namespace SisWeb.Controllers
         }
 
         // POST: api/Categoria
-        [HttpPost]
-        public async Task<ActionResult<Categoria>> Crear([FromBody]CrearViewModel model)
+        [HttpPost("[action]")]
+        [EnableCors("Todos")]
+        public async Task<ActionResult> Crear([FromBody]CrearViewModel model)
         {
 
             if (!ModelState.IsValid)

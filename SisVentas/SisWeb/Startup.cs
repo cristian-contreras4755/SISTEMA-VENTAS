@@ -30,6 +30,14 @@ namespace SisWeb
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
             services.AddDbContext<DBcontextSis>(options =>
             options.UseSqlServer(Configuration.GetConnectionString("Conexion")));
+
+            //services.AddCors(option=>option.AddPolicy("Todos",builder=>builder.WithOrigins("*").WithMethods("*")));
+
+            services.AddCors(c =>
+            {
+                c.AddPolicy("Todos", options => options.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader().AllowCredentials());
+            });
+
         }
 
 
@@ -47,6 +55,7 @@ namespace SisWeb
                 app.UseHsts();
             }
 
+            app.UseCors("Todos");
             app.UseHttpsRedirection();
             app.UseMvc();
         }
