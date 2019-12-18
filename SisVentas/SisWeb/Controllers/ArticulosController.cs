@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Datos;
 using Entidad.Almacen;
 using SisWeb.Models.Almacen.Articulo;
+using Microsoft.AspNetCore.Cors;
 
 namespace SisWeb.Controllers
 {
@@ -71,7 +72,150 @@ namespace SisWeb.Controllers
                 condicion = articulo.condicion
             });
         }
-        
+
+
+
+
+
+
+        [HttpPut("[action]")]
+        public async Task<IActionResult> Actualizar([FromBody] ActualizarViewModel Model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            if (Model.idcategoria <= 0)
+            {
+                return BadRequest();
+            }
+
+            var articulo = await _context.Articulos.FirstOrDefaultAsync(c => c.idarticulo == Model.idarticulo);
+
+            if (articulo == null)
+            {
+                return NotFound();
+            }
+
+            articulo.nombre = Model.nombre;
+            articulo.idcategoria = Model.idcategoria;
+            articulo.codigo = Model.codigo;
+            articulo.nombre = Model.nombre;
+            articulo.precio_venta = Model.precio_venta;
+            articulo.stock = Model.stock;
+            articulo.descripcion = Model.descripcion;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                // Guardar Excepción
+                return BadRequest();
+            }
+
+            return Ok();
+        }
+
+        // POST: api/Categoria
+        [HttpPost("[action]")]
+        [EnableCors("Todos")]
+        public async Task<ActionResult> Crear([FromBody]CrearViewModel model)
+        {
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            Articulo articulo = new Articulo
+            {
+                idcategoria = model.idcategoria,
+                codigo = model.codigo,
+                nombre = model.nombre,
+                precio_venta = model.precio_venta,
+                stock = model.stock,
+                descripcion = model.descripcion,
+                condicion = true
+
+            };
+
+            _context.Articulos.Add(articulo);
+            try
+            {
+                await _context.SaveChangesAsync();
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest();
+            }
+
+        }
+
+
+
+        [HttpPut("[action]/{id}")]
+        public async Task<IActionResult> Desactivar([FromRoute] int id)
+        {
+
+            if (id <= 0)
+            {
+                return BadRequest();
+            }
+
+            var articulo = await _context.Articulos.FirstOrDefaultAsync(c => c.idarticulo == id);
+
+            if (articulo == null)
+            {
+                return NotFound();
+            }
+
+            articulo.condicion = false;
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                // Guardar Excepción
+                return BadRequest();
+            }
+
+            return Ok();
+        }
+
+        [HttpPut("[action]/{id}")]
+        public async Task<IActionResult> Activar([FromRoute] int id)
+        {
+
+            if (id <= 0)
+            {
+                return BadRequest();
+            }
+
+            var articulo = await _context.Articulos.FirstOrDefaultAsync(c => c.idarticulo == id);
+
+            if (articulo == null)
+            {
+                return NotFound();
+            }
+
+            articulo.condicion = true;
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                // Guardar Excepción
+                return BadRequest();
+            }
+
+            return Ok();
+        }
 
 
 
