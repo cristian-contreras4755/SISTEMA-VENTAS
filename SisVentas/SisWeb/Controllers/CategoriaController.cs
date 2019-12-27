@@ -41,6 +41,21 @@ namespace SisWeb.Controllers
 
 
 
+        // GET: api/Categoria
+        [HttpGet("[action]")]
+        public async Task<IEnumerable<SelectViewModel>> Select()
+        {
+            var categoria = await _context.categorias.Where(a=>a.condicion==true).ToListAsync();
+
+            return categoria.Select(c => new SelectViewModel
+            {
+                idcategoria = c.idcategoria,
+                nombre = c.nombre,           
+            });
+        }
+
+
+
 
         // GET: api/Categoria/5
         [HttpGet("[action]/{id}")]

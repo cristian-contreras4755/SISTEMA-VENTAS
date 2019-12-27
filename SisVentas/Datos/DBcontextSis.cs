@@ -1,5 +1,7 @@
 ﻿using Datos.Almacen;
+using Datos.usuario;
 using Entidad.Almacen;
+using Entidad.Usuario;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -12,6 +14,9 @@ namespace Datos
 
         public DbSet<Categoria> categorias { get; set; }
         public DbSet<Articulo> Articulos { get; set; }
+        public DbSet<Rol> Roles { get; set; }
+
+
 
         public DBcontextSis(DbContextOptions<DBcontextSis> options) : base(options)
         {
@@ -24,6 +29,7 @@ namespace Datos
             base.OnModelCreating(modelBuilder);
             modelBuilder.ApplyConfiguration(new CategoriaMap());
             modelBuilder.ApplyConfiguration(new ArcticuloMap());
+            modelBuilder.ApplyConfiguration(new RolMap());
         }
 
 
