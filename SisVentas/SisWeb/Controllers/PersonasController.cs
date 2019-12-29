@@ -26,7 +26,7 @@ namespace SisWeb.Controllers
 
         // GET: api/Articulos
         [HttpGet("[action]")]
-        public async Task<IEnumerable<PersonaViewModel>> ListarCliente()
+        public async Task<IEnumerable<PersonaViewModel>> ListarClientes()
         {
             var persona = await _context.Personas.Where(p=>p.tipo_persona=="Cliente").ToListAsync();
             return persona.Select(p => new PersonaViewModel
@@ -44,7 +44,7 @@ namespace SisWeb.Controllers
 
         // GET: api/Articulos
         [HttpGet("[action]")]
-        public async Task<IEnumerable<PersonaViewModel>> ListarProveedor()
+        public async Task<IEnumerable<PersonaViewModel>> ListarProveedores()
         {
             var persona = await _context.Personas.Where(p => p.tipo_persona == "Proveedor").ToListAsync();
             return persona.Select(p => new PersonaViewModel
