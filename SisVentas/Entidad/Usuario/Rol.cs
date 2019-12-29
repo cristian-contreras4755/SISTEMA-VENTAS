@@ -14,7 +14,6 @@ namespace Entidad.Usuario
         [StringLength(256)]
         public string descripcion { get; set; }
         public bool condicion { get; set; }
-
-        //public ICollection<Usuario> usuarios { get; set; }
+        public ICollection<Usuario> usuarios { get; set; }
     }
 }

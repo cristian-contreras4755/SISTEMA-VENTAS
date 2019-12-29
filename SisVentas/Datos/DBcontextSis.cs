@@ -15,8 +15,7 @@ namespace Datos
         public DbSet<Categoria> categorias { get; set; }
         public DbSet<Articulo> Articulos { get; set; }
         public DbSet<Rol> Roles { get; set; }
-
-
+        public DbSet<Usuario> Usuarios { get; set; }
 
         public DBcontextSis(DbContextOptions<DBcontextSis> options) : base(options)
         {
@@ -30,6 +29,7 @@ namespace Datos
             modelBuilder.ApplyConfiguration(new CategoriaMap());
             modelBuilder.ApplyConfiguration(new ArcticuloMap());
             modelBuilder.ApplyConfiguration(new RolMap());
+            modelBuilder.ApplyConfiguration(new UsuarioMap());
         }
 
 
