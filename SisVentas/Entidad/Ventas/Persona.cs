@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Entidad.Almacen;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
@@ -19,6 +20,7 @@ namespace Entidad.Ventas
         public string direccion { get; set; }
         public string telefono { get; set; }
         public string email { get; set; }
+        public ICollection<Ingreso> ingresos { get; set; }
     }
 
 

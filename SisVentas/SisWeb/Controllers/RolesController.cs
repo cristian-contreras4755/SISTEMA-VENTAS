@@ -6,11 +6,13 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Datos;
-using Entidad.Usuario;
+using Entidad.Usuarios;
 using SisWeb.Models.Usuarios.Rol;
+using Microsoft.AspNetCore.Authorization;
 
 namespace SisWeb.Controllers
 {
+    [Authorize(Roles = "Administrador")]
     [Route("api/[controller]")]
     [ApiController]
     public class RolesController : ControllerBase

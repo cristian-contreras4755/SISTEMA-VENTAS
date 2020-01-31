@@ -9,9 +9,11 @@ using Datos;
 using Entidad.Almacen;
 using SisWeb.Models.Almacen.Categoria;
 using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.Authorization;
 
 namespace SisWeb.Controllers
 {
+    [Authorize(Roles ="Administrador,Almacenero")]
     [Route("api/[controller]")]
     [ApiController]
     public class CategoriaController : ControllerBase

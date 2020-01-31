@@ -1,11 +1,12 @@
-﻿using System;
+﻿using Entidad.Almacen;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
 
-namespace Entidad.Usuario
+namespace Entidad.Usuarios
 {
- public   class Usuario
+    public   class Usuario
     {
 
         public int idusuario { get; set; }
@@ -26,5 +27,7 @@ namespace Entidad.Usuario
         public byte[] password_salt { get; set; }
         public bool condicion { get; set; }
         public Rol rol { get; set; }
+
+         public  ICollection <Ingreso> ingresos { get; set; }
     }
 }

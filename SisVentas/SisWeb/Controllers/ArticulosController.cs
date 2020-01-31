@@ -9,6 +9,7 @@ using Datos;
 using Entidad.Almacen;
 using SisWeb.Models.Almacen.Articulo;
 using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.Authorization;
 
 namespace SisWeb.Controllers
 {
@@ -23,7 +24,7 @@ namespace SisWeb.Controllers
             _context = context;
         }
 
-
+        [Authorize(Roles = "Administrador,Almacenero")]
         // GET: api/Articulos
         [HttpGet("[action]")]
         public async Task<IEnumerable<ArticuloViewModel>> Listar()
@@ -48,7 +49,34 @@ namespace SisWeb.Controllers
 
 
 
-        // GET: api/Articulos/5
+        [Authorize(Roles = "Administrador,Almacenero")]
+        [HttpGet("[action]/{texto}")]
+        public async Task<IEnumerable<ArticuloViewModel>> ListarIngreso([FromRoute] string texto)
+        {
+            var articulo = await _context.Articulos.Include(a => a.categoria)
+                .Where(n=>n.nombre.Contains(texto))
+                .Where(n => n.condicion==true)
+                .ToListAsync();
+
+
+            return articulo.Select(a => new ArticuloViewModel
+            {
+                idarticulo = a.idarticulo,
+                idcategoria = a.idcategoria,
+                categoria = a.categoria.nombre,
+                codigo = a.codigo,
+                nombre = a.nombre,
+                stock = a.stock,
+                precio_venta = a.precio_venta,
+                descripcion = a.descripcion,
+                condicion = a.condicion
+
+            });
+        }
+
+
+
+        [Authorize(Roles = "Administrador,Almacenero")]
         [HttpGet("[action]/{id}")]
         public async Task<ActionResult> Mostrar([FromRoute] int id)
         {
@@ -74,10 +102,37 @@ namespace SisWeb.Controllers
         }
 
 
+        [Authorize(Roles = "Administrador,Almacenero")]
+        [HttpGet("[action]/{codigo}")]
+        public async Task<ActionResult> BuscarCodigoIngreso([FromRoute] string codigo)
+        {
+            var articulo = await _context.Articulos.Include(a => a.categoria).
+                Where(a=>a.condicion==true).
+                SingleOrDefaultAsync(a => a.codigo == codigo);
+
+            if (articulo == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(new ArticuloViewModel
+            {
+                idarticulo = articulo.idarticulo,
+                idcategoria = articulo.idcategoria,
+                categoria = articulo.categoria.nombre,
+                codigo = articulo.codigo,
+                nombre = articulo.nombre,
+                descripcion = articulo.descripcion,
+                stock = articulo.stock,
+                precio_venta = articulo.precio_venta,
+                condicion = articulo.condicion
+            });
+        }
 
 
 
 
+        [Authorize(Roles = "Administrador,Almacenero")]
         [HttpPut("[action]")]
         public async Task<IActionResult> Actualizar([FromBody] ActualizarViewModel Model)
         {
@@ -119,6 +174,7 @@ namespace SisWeb.Controllers
             return Ok();
         }
 
+        [Authorize(Roles = "Administrador,Almacenero")]
         // POST: api/Categoria
         [HttpPost("[action]")]
         [EnableCors("Todos")]
@@ -156,7 +212,7 @@ namespace SisWeb.Controllers
         }
 
 
-
+        [Authorize(Roles = "Administrador,Almacenero")]
         [HttpPut("[action]/{id}")]
         public async Task<IActionResult> Desactivar([FromRoute] int id)
         {
@@ -187,6 +243,7 @@ namespace SisWeb.Controllers
             return Ok();
         }
 
+        [Authorize(Roles = "Administrador,Almacenero")]
         [HttpPut("[action]/{id}")]
         public async Task<IActionResult> Activar([FromRoute] int id)
         {

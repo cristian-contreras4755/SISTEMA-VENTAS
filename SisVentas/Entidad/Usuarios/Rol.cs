@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
 
-namespace Entidad.Usuario
+namespace Entidad.Usuarios
 {
   public  class Rol
     {

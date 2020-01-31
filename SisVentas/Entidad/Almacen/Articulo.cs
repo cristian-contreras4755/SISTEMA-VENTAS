@@ -22,6 +22,7 @@ namespace Entidad.Almacen
         public string descripcion { get; set; }
         public bool condicion { get; set; }
         public Categoria categoria { get; set; }
+        public ICollection<DetalleIngreso>  detallesIngresos { get; set; }
 
     }
 }

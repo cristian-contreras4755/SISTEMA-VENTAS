@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Datos;
 using Entidad.Ventas;
 using SisWeb.Models.Ventas.Persona;
+using Microsoft.AspNetCore.Authorization;
 
 namespace SisWeb.Controllers
 {
@@ -23,7 +24,7 @@ namespace SisWeb.Controllers
         }
 
 
-
+        [Authorize(Roles = "Administrador,Vendedor")]
         // GET: api/Articulos
         [HttpGet("[action]")]
         public async Task<IEnumerable<PersonaViewModel>> ListarClientes()
@@ -42,6 +43,7 @@ namespace SisWeb.Controllers
             });
         }
 
+        [Authorize(Roles = "Almacenero,Administrador")]
         // GET: api/Articulos
         [HttpGet("[action]")]
         public async Task<IEnumerable<PersonaViewModel>> ListarProveedores()
@@ -61,7 +63,23 @@ namespace SisWeb.Controllers
         }
 
 
+        [Authorize(Roles = "Almacenero,Administrador")]
+        [HttpGet("[action]")]
+        public async Task<IEnumerable<SelectViewModel>> SelectProveedores()
+        {
+            var persona = await _context.Personas.Where(p => p.tipo_persona == "Proveedor").ToListAsync();
 
+            return persona.Select(p => new SelectViewModel
+            {
+                idpersona = p.idpersona,
+                nombre = p.nombre,
+            });
+        }
+
+
+
+
+        [Authorize(Roles = "Administrador,Almacenero,Vendedor")]
         // POST: api/Usuarios/Crear
         [HttpPost("[action]")]
         public async Task<IActionResult> Crear([FromBody] CrearViewModel model)
@@ -104,6 +122,7 @@ namespace SisWeb.Controllers
             return Ok();
         }
 
+        [Authorize(Roles = "Administrador,Almacenero,Vendedor")]
         // PUT: api/Articulos/Actualizar
         [HttpPut("[action]")]
         public async Task<IActionResult> Actualizar([FromBody] ActualizarViewModel model)

@@ -1,4 +1,4 @@
-﻿using Entidad.Usuario;
+﻿using Entidad.Usuarios;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System;
