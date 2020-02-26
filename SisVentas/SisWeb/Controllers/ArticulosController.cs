@@ -76,6 +76,34 @@ namespace SisWeb.Controllers
 
 
 
+        [Authorize(Roles = "Vendedor,Administrador")]
+        [HttpGet("[action]/{texto}")]
+        public async Task<IEnumerable<ArticuloViewModel>> ListarVenta([FromRoute] string texto)
+        {
+            var articulo = await _context.Articulos.Include(a => a.categoria)
+                .Where(n => n.nombre.Contains(texto)).Where(a=>a.stock>0)
+                .Where(n => n.condicion == true)
+                .ToListAsync();
+
+
+            return articulo.Select(a => new ArticuloViewModel
+            {
+                idarticulo = a.idarticulo,
+                idcategoria = a.idcategoria,
+                categoria = a.categoria.nombre,
+                codigo = a.codigo,
+                nombre = a.nombre,
+                stock = a.stock,
+                precio_venta = a.precio_venta,
+                descripcion = a.descripcion,
+                condicion = a.condicion
+
+            });
+        }
+
+
+
+
         [Authorize(Roles = "Administrador,Almacenero")]
         [HttpGet("[action]/{id}")]
         public async Task<ActionResult> Mostrar([FromRoute] int id)
@@ -128,6 +156,35 @@ namespace SisWeb.Controllers
                 condicion = articulo.condicion
             });
         }
+
+        [Authorize(Roles = "Vendedor,Administrador")]
+        [HttpGet("[action]/{codigo}")]
+        public async Task<ActionResult> BuscarCodigoVenta([FromRoute] string codigo)
+        {
+            var articulo = await _context.Articulos.Include(a => a.categoria).
+                Where(a => a.condicion == true).Where(A=>A.stock>0).
+                SingleOrDefaultAsync(a => a.codigo == codigo);
+
+            if (articulo == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(new ArticuloViewModel
+            {
+                idarticulo = articulo.idarticulo,
+                idcategoria = articulo.idcategoria,
+                categoria = articulo.categoria.nombre,
+                codigo = articulo.codigo,
+                nombre = articulo.nombre,
+                descripcion = articulo.descripcion,
+                stock = articulo.stock,
+                precio_venta = articulo.precio_venta,
+                condicion = articulo.condicion
+            });
+        }
+
+
 
 
 

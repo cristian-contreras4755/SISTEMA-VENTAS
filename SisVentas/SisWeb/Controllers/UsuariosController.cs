@@ -87,7 +87,8 @@ namespace SisWeb.Controllers
             var token = new JwtSecurityToken(
               _config["Jwt:Issuer"],
               _config["Jwt:Issuer"],
-              expires: DateTime.Now.AddMinutes(30),
+                expires : DateTime.UtcNow.AddDays(1),
+            //  expires: DateTime.Now.AddMinutes(30),
               signingCredentials: creds,
               claims: claims);
 

@@ -55,6 +55,39 @@ namespace SisWeb.Controllers
         }
 
 
+        [Authorize(Roles = "Administrador,Almacenero")]
+        [HttpGet("[action]/{texto}")]
+        public async Task<IEnumerable<IngresoViewModel>> ListarFiltro([FromRoute] string texto)
+        {
+
+            var ingreso = await _context.Ingreso
+                            .Include(i => i.usuario)
+                            .Include(i => i.persona)
+                            .Where(a=>a.num_comprobante.Contains(texto))
+                            .OrderByDescending(i => i.idingreso)
+                            .ToListAsync();
+
+            return ingreso.Select(i => new IngresoViewModel
+            {
+                idingreso = i.idingreso,
+                idproveedor = i.idproveedor,
+                proveedor = i.persona.nombre,
+                idusuario = i.idusuario,
+                usuario = i.usuario.nombre,
+                tipo_comprobante = i.tipo_comprobante,
+                serie_comprobante = i.serie_comprobante,
+                num_comprobante = i.num_comprobante,
+                fecha_hora = i.fecha_hora,
+                impuesto = i.impuesto,
+                total = i.total,
+                estado = i.estado
+            });
+        }
+
+
+
+
+
 
 
         [Authorize(Roles = "Administrador,Almacenero")]
@@ -80,7 +113,7 @@ namespace SisWeb.Controllers
 
 
         // POST: api/Ingresos/Crear
-        // [Authorize(Roles = "Administrador,Almacenero")]
+        [Authorize(Roles = "Administrador,Almacenero")]
         [HttpPost("[action]")]
         public async Task<IActionResult> Crear([FromBody] CrearViewModel model)
         {
@@ -132,6 +165,135 @@ namespace SisWeb.Controllers
         }
 
 
+
+
+/*
+        // POST: api/Ingresos/Crear
+        [Authorize(Roles = "Administrador,Almacenero")]
+        [HttpPut("[action]/{id}")]
+        public async Task<IActionResult> Anular([FromRoute] int id)
+        {
+
+            if (id <= 0)
+            {
+                return BadRequest();
+            }
+
+            var ingreso = await _context.Ingreso.FirstOrDefaultAsync(c => c.idingreso == id);
+
+            if (ingreso == null)
+            {
+                return NotFound();
+            }
+
+            ingreso.estado = "Anulado";
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                // Guardar Excepción
+                return BadRequest();
+            }
+
+            return Ok();
+        }
+
+        */
+  
+
+
+
+
+        // PUT: api/Ingresos/Anular/1
+        [Authorize(Roles = "Almacenero,Administrador")]
+        [HttpPut("[action]/{id}")]
+        public async Task<IActionResult> Anular([FromRoute] int id)
+
+        {
+
+
+
+            if (id <= 0)
+
+            {
+
+                return BadRequest();
+
+            }
+
+            var ingreso = await _context.Ingreso.FirstOrDefaultAsync(c => c.idingreso == id);
+
+
+
+            if (ingreso == null)
+
+            {
+
+                return NotFound();
+
+            }
+
+
+
+            ingreso.estado = "Anulado";
+
+
+
+            try
+
+            {
+
+                await _context.SaveChangesAsync();
+
+
+
+                // Inicio de código para devolver stock
+
+                // 1. Obtenemos los detalles
+
+                var detalle = await _context.detallesIngreso.Include(a => a.articulo).Where(d => d.idingreso == id).ToListAsync();
+
+                //2. Recorremos los detalles
+
+                foreach (var det in detalle)
+
+                {
+
+                    //Obtenemos el artículo del detalle actual
+
+                    var articulo = await _context.Articulos.FirstOrDefaultAsync(a => a.idarticulo == det.articulo.idarticulo);
+
+                    //actualizamos el stock
+
+                    articulo.stock = det.articulo.stock - det.cantidad;
+
+                    //Guardamos los cambios
+
+                    await _context.SaveChangesAsync();
+
+                }
+
+                // Fin del código para devolver stock
+
+
+
+            }
+
+            catch (DbUpdateConcurrencyException)
+
+            {
+
+                // Guardar Excepción
+
+                return BadRequest();
+
+            }
+
+            return Ok();
+
+        }
 
 
 
