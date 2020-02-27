@@ -1,9 +1,11 @@
 ﻿using Datos.Almacen;
 using Datos.usuario;
 using Datos.Ventas;
+using Datos.Ventas.TipoDocumento;
 using Entidad.Almacen;
 using Entidad.Usuarios;
 using Entidad.Ventas;
+using Entidad.Ventas.TipoDocumento;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -23,6 +25,7 @@ namespace Datos
         public DbSet<DetalleIngreso> detallesIngreso { get; set; }
         public DbSet<Venta> Venta { get; set; }
         public DbSet<DetalleVenta> DetallesVentas { get; set; }
+        public DbSet<Serie> Serie { get; set; }
 
 
 
@@ -45,6 +48,7 @@ namespace Datos
             modelBuilder.ApplyConfiguration(new DetalleIngresoMap());
             modelBuilder.ApplyConfiguration(new VentaMap());
             modelBuilder.ApplyConfiguration(new VentaDetalleMap());
+            modelBuilder.ApplyConfiguration(new SerieMap());
 
 
 

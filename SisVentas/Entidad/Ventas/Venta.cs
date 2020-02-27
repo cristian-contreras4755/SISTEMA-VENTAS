@@ -14,6 +14,10 @@ namespace Entidad.Ventas
         public int idcliente { get; set; }
         [Required]
         public int idusuario { get; set; }
+
+        [Required]
+        public int Id_Serie { get; set; }
+
         [Required]
         public string tipo_comprobante { get; set; }
         public string serie_comprobante { get; set; }

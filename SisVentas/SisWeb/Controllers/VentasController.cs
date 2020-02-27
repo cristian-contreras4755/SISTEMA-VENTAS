@@ -119,15 +119,37 @@ namespace SisWeb.Controllers
             {
                 return BadRequest(ModelState);
             }
+
             var fechaHora = DateTime.Now;
+
+            // var generar serie 
+
+            var serie = await _context.Serie.Where(a => a.Cd_TD == model.tipo_comprobante).Where(a => a.IB_Estado == true).FirstOrDefaultAsync();
+            int correlativo;
+            string nroDoc="";
+            if (serie!=null)
+            {
+             var    ventas = await _context.Venta.Where(a => a.tipo_comprobante == model.tipo_comprobante).Where(a => a.Id_Serie== serie.Id_Serie).CountAsync();
+
+                int caracteres = ventas.ToString().Length;
+                string text = "00000000";
+                 correlativo = ventas + 1;
+                 nroDoc = text.Remove(0, correlativo.ToString().Length) + correlativo;
+            }
+            else
+            {
+                return BadRequest(new { error="no se pudo generar correlativo"});
+            }
+
 
             Venta venta = new Venta
             {
                 idcliente = model.idcliente,
                 idusuario = model.idusuario,
+                Id_Serie = serie.Id_Serie,
                 tipo_comprobante = model.tipo_comprobante,
-                serie_comprobante = model.serie_comprobante,
-                num_comprobante = model.num_comprobante,
+                serie_comprobante = serie.NroSerie,
+                num_comprobante = nroDoc,
                 fecha_hora = fechaHora,
                 impuesto = model.impuesto,
                 total = model.total,
@@ -157,6 +179,8 @@ namespace SisWeb.Controllers
             }
             catch (Exception ex)
             {
+
+                string Error = ex.Message;
                 return BadRequest();
             }
 

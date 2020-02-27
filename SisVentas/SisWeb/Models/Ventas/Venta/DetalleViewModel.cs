@@ -8,7 +8,6 @@ namespace SisWeb.Models.Ventas.Venta
 {
     public class DetalleViewModel
     {
-
         [Required]
         public int idarticulo { get; set; }
         public string articulo { get; set; }
