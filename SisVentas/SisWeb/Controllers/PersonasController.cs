@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Datos;
 using Entidad.Ventas;
 using SisWeb.Models.Ventas.Persona;
+using SisWeb.Models.Common;
 using Microsoft.AspNetCore.Authorization;
 
 namespace SisWeb.Controllers
@@ -43,7 +44,58 @@ namespace SisWeb.Controllers
             });
         }
 
-        [Authorize(Roles = "Almacenero,Administrador")]
+
+        [Authorize(Roles = "Administrador,Vendedor")]
+        // GET: api/Articulos
+        [HttpGet("[action]/{text_busqueda}")]
+        public async Task<IEnumerable<PersonaViewModel>> FiltrarClientes( [FromRoute] /*string campo_busqueda, */string  text_busqueda)
+        {
+
+
+            if (String.IsNullOrEmpty( text_busqueda))
+            {
+
+
+                var persona1 = await _context.Personas.Where(p => p.tipo_persona == "Cliente").ToListAsync();
+
+                return persona1.Select(p => new PersonaViewModel
+                {
+                    idpersona = p.idpersona,
+                    tipo_persona = p.tipo_persona,
+                    nombre = p.nombre,
+                    tipo_documento = p.tipo_documento,
+                    num_documento = p.num_documento,
+                    direccion = p.direccion,
+                    telefono = p.telefono,
+                    email = p.email
+                });
+            }
+            else
+            {
+                var persona = await _context.Personas.Where(p => p.tipo_persona == "Cliente").Where(p => p.nombre.Contains(text_busqueda)).ToListAsync();
+
+                return persona.Select(p => new PersonaViewModel
+                {
+                    idpersona = p.idpersona,
+                    tipo_persona = p.tipo_persona,
+                    nombre = p.nombre,
+                    tipo_documento = p.tipo_documento,
+                    num_documento = p.num_documento,
+                    direccion = p.direccion,
+                    telefono = p.telefono,
+                    email = p.email
+                });
+
+            }
+
+
+
+        }
+
+
+
+
+[Authorize(Roles = "Almacenero,Administrador")]
         // GET: api/Articulos
         [HttpGet("[action]")]
         public async Task<IEnumerable<PersonaViewModel>> ListarProveedores()
@@ -77,6 +129,10 @@ namespace SisWeb.Controllers
         }
 
 
+
+
+
+
         [Authorize(Roles = "Vendedor,Administrador")]
         [HttpGet("[action]")]
         public async Task<IEnumerable<SelectViewModel>> SelectClientes()
@@ -89,6 +145,9 @@ namespace SisWeb.Controllers
                 nombre = p.nombre,
             });
         }
+
+
+
 
 
         [Authorize(Roles = "Administrador,Almacenero,Vendedor")]
@@ -108,7 +167,12 @@ namespace SisWeb.Controllers
                 return BadRequest("El email ya existe");
             }
 
-       
+
+            if (await _context.Personas.AnyAsync(p => p.num_documento == model.num_documento) && await _context.Personas.AnyAsync(p => p.tipo_documento == model.tipo_documento))
+            {
+                return BadRequest("Ya  hay  un registro con el  mismo  tipo de identidad y número   de documento " + model.tipo_documento + "-"+model.num_documento);
+            }
+
 
             Persona persona = new Persona
             {

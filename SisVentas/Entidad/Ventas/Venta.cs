@@ -1,4 +1,5 @@
 ﻿using Entidad.Usuarios;
+using Entidad.Ventas.TipoDocumento;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -35,8 +36,7 @@ namespace Entidad.Ventas
         public ICollection<DetalleVenta> detalles { get; set; }
         public Usuario usuario { get; set; }
         public Persona persona { get; set; }
-
-
+        public Serie serie { get; set; }
 
     }
 }

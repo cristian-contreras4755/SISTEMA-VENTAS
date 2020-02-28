@@ -11,12 +11,10 @@ namespace Datos.Ventas
     {
         public void Configure(EntityTypeBuilder<Venta> builder)
         {
-            builder.ToTable("venta")
-                        .HasKey(v=> v.idventa);
+            builder.ToTable("venta").HasKey(v=> v.idventa);
 
             builder.HasOne(p => p.persona).WithMany(p => p.ventas).HasForeignKey(v=>v.idcliente);
-
-
+            builder.HasOne(s => s.serie).WithMany(s => s.ventas).HasForeignKey(v => v.Id_Serie);
         }
     }
 }

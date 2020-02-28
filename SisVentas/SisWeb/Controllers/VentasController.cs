@@ -40,13 +40,18 @@ namespace SisWeb.Controllers
             return venta.Select(v => new VentaViewModel
             {
                 idventa = v.idventa,
-                idcliente = v.idcliente,
-                cliente = v.persona.nombre,
                 idusuario = v.idusuario,
                 usuario = v.usuario.nombre,
-                tipo_comprobante = v.tipo_comprobante,
-                serie_comprobante = v.serie_comprobante,
-                num_comprobante = v.num_comprobante,
+                //cliente
+                idcliente = v.idcliente,
+                cliente = v.persona.nombre,
+                num_documento = v.persona.num_documento,
+                direccion = v.persona.direccion,
+
+                //comprobante
+                nom_comprobante = v.tipo_comprobante,
+                num_serie_comprobante= v.serie_comprobante+"-"+ v.num_comprobante,
+
                 fecha_hora = v.fecha_hora,
                 impuesto = v.impuesto,
                 total = v.total,
@@ -70,18 +75,39 @@ namespace SisWeb.Controllers
 
             return venta.Select(v => new VentaViewModel
             {
+
+                idventa = v.idventa,
+                idusuario = v.idusuario,
+                usuario = v.usuario.nombre,
+                //cliente
+                idcliente = v.idcliente,
+                cliente = v.persona.nombre,
+                num_documento = v.persona.num_documento,
+                direccion = v.persona.direccion,
+
+                //comprobante
+                nom_comprobante = v.tipo_comprobante,
+                num_serie_comprobante = v.serie_comprobante + "-" + v.num_comprobante,
+
+                fecha_hora = v.fecha_hora,
+                impuesto = v.impuesto,
+                total = v.total,
+                estado = v.estado
+
+                /*
                 idventa = v.idventa,
                 idcliente = v.idcliente,
                 cliente = v.persona.nombre,
                 idusuario = v.idusuario,
                 usuario = v.usuario.nombre,
-                tipo_comprobante = v.tipo_comprobante,
-                serie_comprobante = v.serie_comprobante,
-                num_comprobante = v.num_comprobante,
+                num_documento = v.persona.num_documento,
+                direccion = v.persona.direccion,
+                nom_comprobante = v.tipo_comprobante,
+                num_serie_comprobante = v.serie_comprobante + "-" + v.num_comprobante,
                 fecha_hora = v.fecha_hora,
                 impuesto = v.impuesto,
                 total = v.total,
-                estado = v.estado
+                estado = v.estado*/
             });
         }
 
@@ -183,9 +209,15 @@ namespace SisWeb.Controllers
                 string Error = ex.Message;
                 return BadRequest();
             }
-
-            return Ok();
+            return Ok(venta.idventa);
         }
+
+
+
+
+
+
+
 
 
         /*

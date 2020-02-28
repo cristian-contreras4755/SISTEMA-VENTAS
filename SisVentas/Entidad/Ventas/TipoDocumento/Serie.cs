@@ -16,5 +16,6 @@ namespace Entidad.Ventas.TipoDocumento
         public int Desde { get; set; }
         public int Hasta { get; set; }
         public bool IB_Estado { get; set; }
+        public ICollection<Venta> ventas { get; set; }
     }
 }
