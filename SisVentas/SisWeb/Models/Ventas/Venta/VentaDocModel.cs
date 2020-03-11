@@ -5,15 +5,13 @@ using System.Threading.Tasks;
 
 namespace SisWeb.Models.Ventas.Venta
 {
-    public class VentaViewModel
+    public class VentaDocModel
     {
         public int idventa { get; set; }
         public int idcliente { get; set; }
         public string cliente { get; set; }
         public string num_documento { get; set; }
-
         public string total_text { get; set; }
-
         public string direccion { get; set; }
         public int idusuario { get; set; }
         public string usuario { get; set; }
@@ -23,8 +21,15 @@ namespace SisWeb.Models.Ventas.Venta
         public decimal impuesto { get; set; }
         public decimal igv { get; set; }
         public decimal bim { get; set; }
-
         public decimal total { get; set; }
         public string estado { get; set; }
+        public List<DetalleViewModel> Detalle { get; set; }
+
+
+
+
+
+
+
     }
 }

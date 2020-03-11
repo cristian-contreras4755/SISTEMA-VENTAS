@@ -17,6 +17,13 @@ namespace SisWeb.Models.Ventas.Venta
         public string tipo_comprobante { get; set; }
         [Required]
         public decimal impuesto { get; set; }
+
+        [Required]
+        public decimal igv { get; set; }
+
+        [Required]
+        public decimal bim { get; set; }
+
         [Required]
         public decimal total { get; set; }
         //Propiedades detalle

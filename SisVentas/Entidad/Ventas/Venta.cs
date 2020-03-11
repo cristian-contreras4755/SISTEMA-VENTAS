@@ -28,6 +28,16 @@ namespace Entidad.Ventas
         public DateTime fecha_hora { get; set; }
         [Required]
         public decimal impuesto { get; set; }
+
+        [Required]
+        public decimal igv { get; set; }
+
+        [Required]
+        public decimal bim { get; set; }
+
+
+
+
         [Required]
         public decimal total { get; set; }
         [Required]

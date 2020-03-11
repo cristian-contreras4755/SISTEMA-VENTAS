@@ -9,6 +9,12 @@ using Datos;
 using Entidad.Ventas;
 using Microsoft.AspNetCore.Authorization;
 using SisWeb.Models.Ventas.Venta;
+using SisWeb.Models.Utilitarios;
+using System.Data.SqlClient;
+using System.Data;
+using Entidad.StoreProcedure;
+using SisWeb.Models.Reporte;
+using System.Data.Common;
 
 namespace SisWeb.Controllers
 {
@@ -37,6 +43,7 @@ namespace SisWeb.Controllers
                             .Take(100)
                             .ToListAsync();
 
+
             return venta.Select(v => new VentaViewModel
             {
                 idventa = v.idventa,
@@ -48,16 +55,23 @@ namespace SisWeb.Controllers
                 num_documento = v.persona.num_documento,
                 direccion = v.persona.direccion,
 
+                total_text = Util.NumeroALetras(v.total.ToString()),
+
+ 
                 //comprobante
-                nom_comprobante = v.tipo_comprobante,
-                num_serie_comprobante= v.serie_comprobante+"-"+ v.num_comprobante,
+               nom_comprobante = v.tipo_comprobante,
+                num_serie_comprobante = v.serie_comprobante + "-" + v.num_comprobante,
 
                 fecha_hora = v.fecha_hora,
                 impuesto = v.impuesto,
+
+                igv = v.igv,
+                bim = v.bim,
+
                 total = v.total,
                 estado = v.estado
 
-            });
+            }) ; 
         }
 
 
@@ -88,9 +102,14 @@ namespace SisWeb.Controllers
                 //comprobante
                 nom_comprobante = v.tipo_comprobante,
                 num_serie_comprobante = v.serie_comprobante + "-" + v.num_comprobante,
+                total_text = Util.NumeroALetras(v.total.ToString()),
 
                 fecha_hora = v.fecha_hora,
                 impuesto = v.impuesto,
+
+                igv = v.igv,
+                bim = v.bim,
+
                 total = v.total,
                 estado = v.estado
 
@@ -110,6 +129,77 @@ namespace SisWeb.Controllers
                 estado = v.estado*/
             });
         }
+
+    //    [Authorize(Roles = "Administrador,Vendedor")]
+        [HttpGet("[action]/{id}")]
+        public async Task<VentaDocModel> VentaConsUn([FromRoute] int id)
+        {
+            var venta = await _context.Venta
+          .Include(v => v.usuario)
+           .Include(v => v.persona)
+           .Where(v => v.idventa== id)
+           .FirstAsync();
+
+            if (venta==null) {
+                return new VentaDocModel();
+            }
+
+
+            VentaDocModel ventaDocModel = new VentaDocModel();
+            List<DetalleViewModel> listaDet = new List<DetalleViewModel>();
+
+
+                ventaDocModel.idventa = venta.idventa;
+            ventaDocModel.idusuario = venta.idusuario;
+            ventaDocModel.usuario = venta.usuario.nombre;
+            //cliente
+            ventaDocModel.idcliente = venta.idcliente;
+            ventaDocModel.cliente = venta.persona.nombre;
+            ventaDocModel.num_documento = venta.persona.num_documento;
+            ventaDocModel.direccion = venta.persona.direccion;
+
+            //comprobante
+            ventaDocModel.nom_comprobante = venta.tipo_comprobante;
+            ventaDocModel.num_serie_comprobante = venta.serie_comprobante + "-" + venta.num_comprobante;
+            ventaDocModel.total_text = Util.NumeroALetras(venta.total.ToString());
+
+            ventaDocModel.fecha_hora = venta.fecha_hora;
+            ventaDocModel.impuesto = venta.impuesto;
+
+            ventaDocModel.igv = venta.igv;
+            ventaDocModel.bim = venta.bim;
+
+            ventaDocModel.total = venta.total;
+            ventaDocModel.estado = venta.estado;
+
+
+            var ventaDet = await _context.DetallesVentas
+            .Include(v => v.articulo)
+            .Where(v => v.idventa == id)
+            .ToListAsync();
+
+
+            List<DetalleViewModel> detalleViewModelgen = new List<DetalleViewModel>();
+            foreach (var item in ventaDet)
+            {
+                DetalleViewModel detalleViewModel1 = new DetalleViewModel();
+                detalleViewModel1.articulo = item.articulo.descripcion;
+                detalleViewModel1.cantidad = item.cantidad;
+                detalleViewModel1.precio = item.precio;
+                detalleViewModel1.precio = item.precio;
+                detalleViewModelgen.Add(detalleViewModel1);
+            }
+            ventaDocModel.Detalle = detalleViewModelgen;
+
+
+            return ventaDocModel;
+        }
+
+
+
+
+
+
 
 
         [Authorize(Roles = "Administrador,Vendedor")]
@@ -167,7 +257,6 @@ namespace SisWeb.Controllers
                 return BadRequest(new { error="no se pudo generar correlativo"});
             }
 
-
             Venta venta = new Venta
             {
                 idcliente = model.idcliente,
@@ -178,6 +267,8 @@ namespace SisWeb.Controllers
                 num_comprobante = nroDoc,
                 fecha_hora = fechaHora,
                 impuesto = model.impuesto,
+                igv = model.igv,
+                bim = model.bim,
                 total = model.total,
                 estado = "Aceptado"
             };
@@ -213,48 +304,122 @@ namespace SisWeb.Controllers
         }
 
 
-
-
-
-
-
-
-
-        /*
-        // PUT: api/Ventas/Anular/1
-        [Authorize(Roles = "Vendedor,Administrador")]
-        [HttpPut("[action]/{id}")]
-        public async Task<IActionResult> Anular([FromRoute] int id)
+        // GET: api/Articulos
+        [HttpGet("[action]")]
+        public  List<sp_venta_diaria>VentaDiaria([FromBody]  model_consulta _model)
         {
-
-            if (id <= 0)
-            {
-                return BadRequest();
-            }
-
-            var venta = await _context.Venta.FirstOrDefaultAsync(v => v.idventa == id);
-
-            if (venta == null)
-            {
-                return NotFound();
-            }
-
-            venta.estado = "Anulado";
-
+            List<sp_venta_diaria> lista = new List<sp_venta_diaria>();
             try
             {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                // Guardar Excepción
-                return BadRequest();
-            }
+                                var param = new SqlParameter[] {
+                                        new SqlParameter() {
+                                            ParameterName = "@FechaInicio",
+                                            SqlDbType =  System.Data.SqlDbType.DateTime,
+                                            Direction = System.Data.ParameterDirection.Input,
+                                            Value =_model.f_inicial
+                                        },
+                                        new SqlParameter() {
+                                            ParameterName = "@FechaFin",
+                                            SqlDbType =  System.Data.SqlDbType.DateTime,
+                                            Direction = System.Data.ParameterDirection.Input,
+                                                Value = _model.f_final
+                                            }};
 
-            return Ok();
+                SqlConnection sqlConnection = new SqlConnection("data source=DESKTOP-699F64C;initial catalog=db_ventasudemy; user id=sa; Password=cristian261.;persist security info=True;" /* _context.Database.GetDbConnection().ConnectionString*/);
+                                     
+                                            var cmm = sqlConnection.CreateCommand();
+                                            cmm.CommandType = System.Data.CommandType.StoredProcedure;
+                                            cmm.CommandText = "sp_venta_diaria";
+                                            cmm.Parameters.AddRange(param);
+                                            cmm.Connection = sqlConnection;
+                                               sqlConnection.Open();
+                                            var reader = cmm.ExecuteReader();
+
+                                                while (reader.Read())
+                                                {
+                                                    sp_venta_diaria modelo = new sp_venta_diaria();
+                                                    modelo.fecha = Convert.ToDateTime(reader["fecha"]);
+                                                    modelo.total = Convert.ToDecimal(reader["total"]);
+                                                    modelo.cantidad = Convert.ToInt32(reader["cantidad"]);
+                                                    lista.Add(modelo);
+                                                }
+
+            }
+            catch (Exception ex)
+            {
+                string s=ex.Message;
+
+                return lista;
+            }
+            return lista;
+
         }
 
-        */
+
+        // GET: api/Articulos
+        [HttpGet("[action]")]
+        public List<VentaMensualViewModel> VentaMensual([FromBody]  model_consulta _model)
+        {
+            /*async Task<IEnumerable<sp_venta_diaria>>*/
+            // IEnumerable<sp_venta_diaria> s= new IEnumerable<sp_venta_diaria>();
+            List<VentaMensualViewModel> lista = new List<VentaMensualViewModel>();
+            try
+            {
+
+
+                var param = new SqlParameter[] {
+                                        new SqlParameter() {
+                                            ParameterName = "@FechaInicio",
+                                            SqlDbType =  System.Data.SqlDbType.DateTime,
+                                            Direction = System.Data.ParameterDirection.Input,
+                                            Value =_model.f_inicial
+                                        },
+                                        new SqlParameter() {
+                                            ParameterName = "@FechaFin",
+                                            SqlDbType =  System.Data.SqlDbType.DateTime,
+                                            Direction = System.Data.ParameterDirection.Input,
+                                                Value = _model.f_final
+                                            }};
+
+
+                SqlConnection sqlConnection = new SqlConnection("data source=DESKTOP-699F64C;initial catalog=db_ventasudemy; user id=sa; Password=cristian261.;persist security info=True;" /* _context.Database.GetDbConnection().ConnectionString*/);
+
+
+
+                    var cmm = sqlConnection.CreateCommand();
+                    cmm.CommandType = System.Data.CommandType.StoredProcedure;
+                    cmm.CommandText = "sp_venta_mensual";
+                    cmm.Parameters.AddRange(param);
+                    cmm.Connection = sqlConnection;
+                   sqlConnection.Open();
+                    var reader = cmm.ExecuteReader();
+                
+                while (reader.Read())
+                    {
+                        VentaMensualViewModel modelo = new VentaMensualViewModel();
+                        modelo.anio = Convert.ToString(reader["anio"]);
+                        modelo.mes= Convert.ToString(reader["mes"]);
+                        modelo.total = Convert.ToDecimal(reader["total"]);
+                        modelo.cantidad = Convert.ToInt32(reader["cantidad"]);
+                        lista.Add(modelo);
+                    }
+
+
+            }
+            catch (Exception ex)
+            {
+
+                return lista; 
+            }
+
+            return lista;
+        }
+
+
+
+
+
+
 
 
         [Authorize(Roles = "Vendedor,Administrador")]
@@ -343,6 +508,15 @@ namespace SisWeb.Controllers
             return Ok();
 
         }
+
+
+
+
+
+
+
+
+
 
 
 

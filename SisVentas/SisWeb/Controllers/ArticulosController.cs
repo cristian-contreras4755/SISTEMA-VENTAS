@@ -334,6 +334,11 @@ namespace SisWeb.Controllers
 
 
 
+
+
+
+
+
         private bool ArticuloExists(int id)
         {
             return _context.Articulos.Any(e => e.idarticulo == id);

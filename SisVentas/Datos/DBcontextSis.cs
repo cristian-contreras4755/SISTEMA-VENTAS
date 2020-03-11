@@ -3,6 +3,7 @@ using Datos.usuario;
 using Datos.Ventas;
 using Datos.Ventas.TipoDocumento;
 using Entidad.Almacen;
+using Entidad.StoreProcedure;
 using Entidad.Usuarios;
 using Entidad.Ventas;
 using Entidad.Ventas.TipoDocumento;
@@ -26,6 +27,13 @@ namespace Datos
         public DbSet<Venta> Venta { get; set; }
         public DbSet<DetalleVenta> DetallesVentas { get; set; }
         public DbSet<Serie> Serie { get; set; }
+        public DbSet<sp_venta_diaria> sp_venta_diaria { get; set; }
+
+
+
+
+
+
 
 
 
@@ -34,6 +42,8 @@ namespace Datos
         {
 
         }
+
+
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -49,10 +59,10 @@ namespace Datos
             modelBuilder.ApplyConfiguration(new VentaMap());
             modelBuilder.ApplyConfiguration(new VentaDetalleMap());
             modelBuilder.ApplyConfiguration(new SerieMap());
-
-
-
         }
+
+
+
 
 
 
